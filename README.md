@@ -54,3 +54,7 @@ res.toGraph()
 ```python
 
 ```
+![png](Screenshot 2021-02-07 193629.png)
+![png](Screenshot 2021-02-07 193656.png)
+
+## 其中每一个颜色代表一种实体
