@@ -54,7 +54,7 @@ res.toGraph()
 ```python
 
 ```
-![png](Screenshot1.png)
+![png](Screenshot1.png=200x100)
 ![png](Screenshot2.png)
 
 ## 其中每一个颜色代表一种实体
