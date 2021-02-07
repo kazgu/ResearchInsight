@@ -55,9 +55,9 @@ res.toGraph()
 
 ```
 
-<img src='Screenshot1.png'  height=500 />
+<img src='Screenshot3.png'  height=500 />
 <br>
-<img src='Screenshot2.png' height=500 />
+<img src='Screenshot1.png' height=500 />
 
 
 ## 其中每一个颜色代表一种实体
