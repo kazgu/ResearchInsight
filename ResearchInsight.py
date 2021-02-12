@@ -167,10 +167,58 @@ class ResearchInsight():
                     author_dict[a]=[row]
                 else:
                     author_dict[a].append(row)
-        strtop='\n'.join(['<li style="background:rgb(237,68,17,%s)">%s</li>'%(1-i*0.06,t) for i,t in enumerate(topa[:15])])
-        rdata=[aa for a in topa[:15] for aa in author_dict[a]]
-        readlist='\n'.join(['<li><h4><a href={0} target="_blank">[{4}]{1},<span style="color:rgb(237,68,17)" >{2}</span>;({3})</a><h4></li>'.format(row['url'],row['authors'],row['title'],row['year'],i) for i, row in enumerate(rdata)])
+        strtop='\n'.join(['<li style="background:rgb(237,68,17,%s)"><span id="%s" ><a href="javascript:void(0);" onclick="point_to(%s)">%s</span></li>'%(1-i*0.06,i+1,i+1,t) for i,t in enumerate(topa[:15])])
+        rdata_dict={aa['title']:{'item':aa,'index':(i+1)} for i, a in enumerate(topa[:15]) for aa in author_dict[a]}
+        rdata=[rdata_dict[rd] for rd in rdata_dict.keys() ]
+        dict_top={a:i+1 for i,a in enumerate(topa[:15])}
+        def get_ids(aus):
+            idds=[]
+            for i,a in enumerate(topa[:15]):
+                if a in aus:
+                    idds.append('%s'%(i+1))
+            aaa='_'.join(idds)
+            return '_%s_'%(aaa)
+        readlist='\n'.join(['<li><h4  name="end_item" id="{5}"><a href={0} target="_blank">[{4}]{1},<span style="color:rgb(237,68,17)" >{2}</span>;({3})</a><h4></li>'.format(row['item']['url'],row['item']['authors'],row['item']['title'],row['item']['year'],i+1,get_ids(row['item']['authors'])) for i, row in enumerate(rdata)])
         readlist='<div><ul>%s</ul></div>'%readlist
+        js='''
+    <script src="leader-line.min.js"></script>
+    <script>
+       var lines = {}; //#019fd8
+  var options = {
+    color: '#5bf', // 指引线颜色
+    endPlug: "disc", // 指引线结束点的样式
+    size: 2, // 线条尺寸
+    startSocket: "right", //在指引线开始的地方从元素左侧开始
+    endSocket: "left", //在指引线开始的地方从元素右侧结束
+    hide:false // 绘制时隐藏，默认为false，在初始化时可能会出现闪烁的线条
+  };
+     function point_to(p)
+     {
+         
+         if(lines)
+         {
+              for (var key in lines) {
+      lines[key].hide();
+    }
+         }
+        
+         ends=document.getElementsByName("end_item");
+         for(i=0;i<ends.length;i++)
+         {
+             if(ends[i].id.indexOf('_'+p+'_')>=0)
+             {
+             lines[p+''+i]=new LeaderLine(
+    document.getElementById(p),
+                  ends[i],
+                 options
+          );
+             }
+
+         }
+        
+     }
+        </script>
+        '''
         with open(fname,'r',encoding='utf8') as f:
             lines=f.readlines()
             for i in range(len(lines)):
@@ -179,7 +227,11 @@ class ResearchInsight():
             if os.path.exists("%s.jpg"%self.name):
                 for i in range(len(lines)):
                     if '></div>' in lines[i]:
-                        lines[i]=lines[i].replace('></div>','></div>\n<table border="0" style="width:{0}"><tr><td style="width:{2}"><img src="{1}" width="{0}"/></td><td style="width:{3}"><ul>{4}</ul></td></tr></table>{5}'.format('100%',"%s.jpg"%self.name,'70%','30%',strtop,readlist))
+                        lines[i]=lines[i].replace('></div>','></div>\n<img src="{1}" width="{0}"/>\n<table border="0" style="width:{0}"><tr><td style="width:{3};vertical-align:top"><ul >{4}</ul></td><td style="width:{2}">{5}</td></tr></table>'.format('100%',"%s.jpg"%self.name,'70%','30%',strtop,readlist))
+                    if '</script>' in lines[i]:
+                        lines[i]=lines[i].replace('</script>','</script>{0}'.format(js))
+                        
+                        
                 
             with open(fname,'w',encoding='utf8') as ww:
                 for line in lines:
